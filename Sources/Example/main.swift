@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2020 mtgto <hogerappa@gmail.com>
 // SPDX-License-Identifier: Apache-2.0
 
+import NIO
 import Foundation
 import Swiftra
 
@@ -11,6 +12,12 @@ let app = App {
     
     get("/hello/:name") { req in
         "Hello \(req.params("name") ?? "guest")"
+    }
+    
+    get("/future") { req in
+        let promise: EventLoopPromise<String> = req.eventLoop.makePromise()
+        promise.succeed("Hello from future")
+        return promise.futureResult
     }
 }
 

@@ -50,7 +50,8 @@ open class App {
             
             switch reqPart {
             case .head(let header):
-                var request = Request(header: header)
+                let channel = context.channel
+                var request = Request(header: header, eventLoop: context.eventLoop)
                 let found = self.app.routes.contains { (route) -> Bool in
                     if route.method != request.header.method {
                         return false
@@ -64,11 +65,25 @@ open class App {
                         #endif
                         if let string = response as? String {
                             let head = HTTPResponseHead(version: .init(major: 1, minor: 1), status: .ok, headers: HTTPHeaders())
-                            _ = context.channel.writeAndFlush(HTTPServerResponsePart.head(head))
-                            let buffer = context.channel.allocator.buffer(string: string)
-                            _ = context.channel.writeAndFlush(HTTPServerResponsePart.body(.byteBuffer(buffer)))
-                            _ = context.channel.writeAndFlush(HTTPServerResponsePart.end(nil)).map {
-                                context.channel.close()
+                            _ = channel.writeAndFlush(HTTPServerResponsePart.head(head))
+                            let buffer = channel.allocator.buffer(string: string)
+                            _ = channel.writeAndFlush(HTTPServerResponsePart.body(.byteBuffer(buffer)))
+                            _ = channel.writeAndFlush(HTTPServerResponsePart.end(nil)).map {
+                                channel.close()
+                            }
+                        } else if let future = response as? EventLoopFuture<String> {
+                            let head = HTTPResponseHead(version: .init(major: 1, minor: 1), status: .ok, headers: HTTPHeaders())
+                            _ = channel.writeAndFlush(HTTPServerResponsePart.head(head))
+                            future.whenComplete { (result) in
+                                if case .success(let response) = result {
+                                    let buffer = channel.allocator.buffer(string: response)
+                                    _ = channel.writeAndFlush(HTTPServerResponsePart.body(.byteBuffer(buffer)))
+                                } else {
+                                    log.info("ERROR:", result)
+                                }
+                                _ = channel.writeAndFlush(HTTPServerResponsePart.end(nil)).map {
+                                    channel.close()
+                                }
                             }
                         }
                         return true
@@ -92,6 +107,9 @@ open class App {
                 #endif
                 break
             case .end:
+                #if DEBUG
+                log.info("END")
+                #endif
                 break
             }
         }

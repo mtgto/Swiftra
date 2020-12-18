@@ -45,6 +45,16 @@ open class App {
             self.app = app
         }
         
+        func handleResponse(channel: Channel, response: Response) {
+            let headers = response.createHeaders()
+            let head = HTTPResponseHead(version: .init(major: 1, minor: 1), status: .ok, headers: HTTPHeaders(headers))
+            _ = channel.writeAndFlush(HTTPServerResponsePart.head(head))
+            _ = response.writeBody(to: channel)
+            _ = channel.writeAndFlush(HTTPServerResponsePart.end(nil)).map {
+                channel.close()
+            }
+        }
+        
         func channelRead(context: ChannelHandlerContext, data: NIOAny) {
             let reqPart = unwrapInboundIn(data)
             
@@ -59,30 +69,15 @@ open class App {
                     // TODO: parse uri to path and querystring and hash
                     if case .success(let match) = route.pathMatcher.match(path: request.header.uri) {
                         request.match = .success(match)
-                        let response = route.handler(request)
-                        #if DEBUG
-                        log.info("Response:", response)
-                        #endif
-                        if let string = response as? String {
-                            let head = HTTPResponseHead(version: .init(major: 1, minor: 1), status: .ok, headers: HTTPHeaders())
-                            _ = channel.writeAndFlush(HTTPServerResponsePart.head(head))
-                            let buffer = channel.allocator.buffer(string: string)
-                            _ = channel.writeAndFlush(HTTPServerResponsePart.body(.byteBuffer(buffer)))
-                            _ = channel.writeAndFlush(HTTPServerResponsePart.end(nil)).map {
-                                channel.close()
-                            }
-                        } else if let future = response as? EventLoopFuture<String> {
-                            let head = HTTPResponseHead(version: .init(major: 1, minor: 1), status: .ok, headers: HTTPHeaders())
-                            _ = channel.writeAndFlush(HTTPServerResponsePart.head(head))
-                            future.whenComplete { (result) in
+                        if case .normal(let handler) = route.handler {
+                            let response = handler(request)
+                            self.handleResponse(channel: channel, response: response)
+                        } else if case .future(let handler) = route.handler {
+                            handler(request).whenComplete { (result) in
                                 if case .success(let response) = result {
-                                    let buffer = channel.allocator.buffer(string: response)
-                                    _ = channel.writeAndFlush(HTTPServerResponsePart.body(.byteBuffer(buffer)))
-                                } else {
-                                    log.info("ERROR:", result)
-                                }
-                                _ = channel.writeAndFlush(HTTPServerResponsePart.end(nil)).map {
-                                    channel.close()
+                                    self.handleResponse(channel: channel, response: response)
+                                } else if case .failure(let error) = result {
+                                    log.info("Error:", error)
                                 }
                             }
                         }

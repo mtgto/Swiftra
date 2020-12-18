@@ -9,9 +9,9 @@ class ResponseTests: XCTestCase {
 
     func testResponse() {
         let textResponse: Response = .text("Hello, world")
-        XCTAssertEqual(textResponse.createHeaders(), ["Content-Type": "text/plain"])
-        let jsonResponse = Response(json: ["hoge": ["fuga", "piyo"]])
-        XCTAssertEqual(jsonResponse?.createHeaders(), ["Content-Type": "application/json"])
+        XCTAssertTrue(textResponse.createHeaders().contains(where: { ("Content-Type", "text/plain") == $0 }))
+        guard let jsonResponse = Response(json: ["hoge": ["fuga", "piyo"]]) else { XCTFail(); return }
+        XCTAssertTrue(jsonResponse.createHeaders().contains(where: { ("Content-Type", "application/json") == $0 }))
     }
 
     static var allTests = [

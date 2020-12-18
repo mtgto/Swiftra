@@ -6,17 +6,17 @@ import Swiftra
 
 let app = App {
     get("/") { req in
-        "Hello, world!"
+        .text("Hello, world!")
     }
     
     get("/hello/:name") { req in
-        "Hello \(req.params("name") ?? "guest")"
+        .text("Hello \(req.params("name") ?? "guest")")
     }
     
-    get("/future") { req in
+    futureGet("/future") { req in
         let promise = req.eventLoop.makePromise(of: String.self)
         promise.succeed("Hello from future")
-        return promise.futureResult
+        return promise.futureResult.map { .text($0) }
     }
     /*
     get("/customize") { req in

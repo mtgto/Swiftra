@@ -37,13 +37,13 @@ public enum Response {
         }
     }
     
-    func createHeaders() -> [String: String] {
+    func createHeaders() -> [(String, String)] {
         let contentType: String
         switch self {
         case .text(_, let detail), .data(_, let detail):
             contentType = detail.contentType
         }
-        return ["Content-Type": contentType]
+        return [("Content-Type", contentType)]
     }
     
     func writeBody(to channel: Channel) -> EventLoopFuture<Void> {
@@ -54,6 +54,6 @@ public enum Response {
         case .data(let data, _):
             buffer = channel.allocator.buffer(bytes: data)
         }
-        return channel.write(buffer)
+        return channel.write(HTTPServerResponsePart.body(.byteBuffer(buffer)))
     }
 }

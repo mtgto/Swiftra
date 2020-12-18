@@ -13,10 +13,14 @@ import NIOHTTP1
 }
 
 public func get(_ path: String, handler: @escaping Handler) -> Route {
-    return createRoute(method: .GET, path: path, handler: handler)
+    return createRoute(method: .GET, path: path, handler: .normal(handler))
 }
 
-private func createRoute(method: HTTPMethod, path: String, handler: @escaping Handler) -> Route {
+public func futureGet(_ path: String, handler: @escaping FutureHandler) -> Route {
+    return createRoute(method: .GET, path: path, handler: .future(handler))
+}
+
+private func createRoute(method: HTTPMethod, path: String, handler: HandlerType) -> Route {
     let matcher = Matcher(path: path)
     return Route(method: method, pathMatcher: matcher, handler: handler)
 }

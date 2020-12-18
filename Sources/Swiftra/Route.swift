@@ -6,6 +6,5 @@ import NIOHTTP1
 public struct Route {
     public let method: HTTPMethod
     public let pathMatcher: Matcher
-    public let handler: Handler
+    public let handler: HandlerType
 }
-

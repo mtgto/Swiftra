@@ -46,10 +46,12 @@ open class App {
         }
         
         func handleResponse(channel: Channel, response: Response) {
-            let headers = response.createHeaders()
+            let responseData = response.data()
+            let headers = response.createHeaders() + [("Content-Length", "\(responseData.count)")]
             let head = HTTPResponseHead(version: .init(major: 1, minor: 1), status: .ok, headers: HTTPHeaders(headers))
-            _ = channel.writeAndFlush(HTTPServerResponsePart.head(head))
-            _ = response.writeBody(to: channel)
+            _ = channel.write(HTTPServerResponsePart.head(head))
+            let buffer = channel.allocator.buffer(bytes: responseData)
+            _ = channel.write(HTTPServerResponsePart.body(.byteBuffer(buffer)))
             _ = channel.writeAndFlush(HTTPServerResponsePart.end(nil)).map {
                 channel.close()
             }

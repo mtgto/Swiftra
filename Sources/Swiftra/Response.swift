@@ -45,15 +45,13 @@ public enum Response {
         }
         return [("Content-Type", contentType)]
     }
-    
-    func writeBody(to channel: Channel) -> EventLoopFuture<Void> {
-        let buffer: ByteBuffer
+
+    func data() -> Data {
         switch self {
         case .text(let text, _):
-            buffer = channel.allocator.buffer(string: text)
+            return text.data(using: .utf8) ?? Data()
         case .data(let data, _):
-            buffer = channel.allocator.buffer(bytes: data)
+            return data
         }
-        return channel.write(HTTPServerResponsePart.body(.byteBuffer(buffer)))
     }
 }

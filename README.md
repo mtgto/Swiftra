@@ -2,30 +2,51 @@
 
 A tiny Sinatra-like web framework for Swift.
 
+Swiftra is a small wrapper on [SwiftNIO](https://github.com/apple/swift-nio).
+
 ## Example
 
 ```swift
-import Foundation
 import Swiftra
 
 let app = App {
     get("/") { req in
-        "Hello, world!"
+        .text("Hello, world!")
     }
-    
+
+    // path parameters
     get("/hello/:name") { req in
-        "Hello \(req.params("name") ?? "guest")"
+        .text("Hello \(req.params("name") ?? "guest")")
     }
     
-    get("/future") { req in
+    // convert Encodable value into JSON
+    get("/json") { req in
+        Response(json: ["Hello": "World!"])!
+    }
+
+    // asynchronous
+    futureGet("/future") { req in
         let promise = req.eventLoop.makePromise(of: String.self)
-        promise.succeed("Hello from future")
-        return promise.futureResult
+        _ = req.eventLoop.scheduleTask(in: .seconds(1)) {
+            promise.succeed("Hello from future")
+        }
+        return promise.futureResult.map { .text($0) }
     }
 }
 
-try! app.run(1337)
+// You can add routes
+app.addRoutes {
+    get("/addRoute") { req in
+        .text("New route is added")
+    }
+}
+
+try! app.start(1337)
 ```
+
+## Installation
+
+Add `https://github.com/mtgto/Swiftra` to your dependencies of Swift Package.
 
 ## Features
 
@@ -38,9 +59,9 @@ try! app.run(1337)
   - [ ] query string
   - [ ] fragment
   - [ ] Cookie
-- [ ] HTTP methods except for GET
+- [ ] HTTP methods except for `GET`
 - [ ] JSON request/response
-- [ ] Error handling callback
+- [ ] Error handling
 - [ ] More performance
 
 ## Contributing
@@ -57,6 +78,10 @@ $ swift-format --configuration .swift-format --in-place YourAwesomeCode.swift
 $ brew install pre-commit
 $ pre-commit install
 ```
+
+## Acknowledgements
+
+Thanks a lot [A µTutorial on SwiftNIO 2](https://www.alwaysrightinstitute.com/microexpress-nio2/).
 
 ## License
 

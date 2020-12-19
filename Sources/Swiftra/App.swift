@@ -10,7 +10,9 @@ open class App {
 
     public init(@DSLMaker routing: () -> [Route]) {
         self.routes = routing()
-        log.info("App.init")
+        #if DEBUG
+            log.info("App.init")
+        #endif
     }
 
     public func run(_ port: Int) throws {
@@ -79,7 +81,10 @@ open class App {
                                 if case .success(let response) = result {
                                     self.handleResponse(channel: channel, response: response)
                                 } else if case .failure(let error) = result {
-                                    log.info("Error:", error)
+                                    // TODO: Call error handler
+                                    #if DEBUG
+                                        log.info("Error:", error)
+                                    #endif
                                 }
                             }
                         }

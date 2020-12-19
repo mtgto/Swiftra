@@ -6,8 +6,9 @@ import NIOHTTP1
 
 @_functionBuilder public struct DSLMaker {
     public static func buildBlock<T>(_ components: T...) -> [T] {
-        //return components
-        log.info("components:", components)
+        #if DEBUG
+            log.info("components:", components)
+        #endif
         return components
     }
 }

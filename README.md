@@ -43,6 +43,21 @@ try! app.run(1337)
 - [ ] Error handling callback
 - [ ] More performance
 
+## Contributing
+
+Please format swift code with [swift-format](https://github.com/apple/swift-format) before send your contribution.
+
+```console
+$ swift-format --configuration .swift-format --in-place YourAwesomeCode.swift
+```
+
+[pre-commit](https://pre-commit.com/) is recommended.
+
+```console
+$ brew install pre-commit
+$ pre-commit install
+```
+
 ## License
 
 Apache License 2.0.

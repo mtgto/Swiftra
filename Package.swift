@@ -6,7 +6,6 @@ import PackageDescription
 let package = Package(
     name: "Swiftra",
     products: [
-        // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "Swiftra",
             targets: ["Swiftra"])
@@ -15,8 +14,6 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-nio.git", "2.0.0"..<"3.0.0")
     ],
     targets: [
-        // Targets are the basic building blocks of a package. A target can define a module or a test suite.
-        // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "Swiftra",
             dependencies: [.product(name: "NIO", package: "swift-nio"), .product(name: "NIOHTTP1", package: "swift-nio")]),

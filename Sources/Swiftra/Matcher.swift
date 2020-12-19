@@ -8,6 +8,7 @@ public enum Match: Equatable {
     case failure
 }
 
+// TODO: Implements Hashable to use key of routing table
 public struct Matcher {
     private let components: [String]
 

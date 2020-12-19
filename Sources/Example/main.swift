@@ -18,7 +18,12 @@ let app = App {
         promise.succeed("Hello from future")
         return promise.futureResult.map { .text($0) }
     }
+}
 
+app.addRoutes {
+    get("/addRoute") { req in
+        .text("New route is added")
+    }
 }
 
 try! app.start(1337)

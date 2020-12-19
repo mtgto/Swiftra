@@ -6,10 +6,14 @@ import NIOHTTP1
 
 open class App {
     private let loopGroup = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
-    private let routes: [Route]
+    private var routes: [Route]
 
-    public init(@DSLMaker routing: () -> [Route]) {
+    public init(@DSLMaker routing: () -> [Route] = { () in [] }) {
         self.routes = routing()
+    }
+
+    public func addRoutes(@DSLMaker routing: () -> [Route]) {
+        self.routes = self.routes + routing()
         #if DEBUG
             log.info("App.init")
         #endif

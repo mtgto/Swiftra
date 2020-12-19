@@ -7,12 +7,12 @@ import NIOHTTP1
 open class App {
     private let loopGroup = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
     private let routes: [Route]
-    
+
     public init(@DSLMaker routing: () -> [Route]) {
         self.routes = routing()
         log.info("App.init")
     }
-    
+
     public func run(_ port: Int) throws {
         let reuseAddrOpt = ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR)
         let bootstrap = ServerBootstrap(group: self.loopGroup)
@@ -30,21 +30,21 @@ open class App {
         // TODO: host should be customizable
         let serverChannel = try bootstrap.bind(host: "localhost", port: port).wait()
         #if DEBUG
-        log.info("Server running on:", serverChannel.localAddress!)
+            log.info("Server running on:", serverChannel.localAddress!)
         #endif
         //try serverChannel.closeFuture.wait()
     }
-    
+
     final class HTTPHandler: ChannelInboundHandler {
         typealias InboundIn = HTTPServerRequestPart
-        
+
         let app: App
         private var buffer: ByteBuffer! = nil
-        
+
         init(_ app: App) {
             self.app = app
         }
-        
+
         func handleResponse(channel: Channel, response: Response) {
             let responseData = response.data()
             let headers = response.createHeaders() + [("Content-Length", "\(responseData.count)")]
@@ -56,10 +56,10 @@ open class App {
                 channel.close()
             }
         }
-        
+
         func channelRead(context: ChannelHandlerContext, data: NIOAny) {
             let reqPart = unwrapInboundIn(data)
-            
+
             switch reqPart {
             case .head(let header):
                 let channel = context.channel
@@ -100,12 +100,12 @@ open class App {
                 break
             case .body(buffer: let body):
                 #if DEBUG
-                log.info("Body:", body)
+                    log.info("Body:", body)
                 #endif
                 break
             case .end:
                 #if DEBUG
-                log.info("END")
+                    log.info("END")
                 #endif
                 break
             }

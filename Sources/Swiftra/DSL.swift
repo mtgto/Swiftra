@@ -24,4 +24,3 @@ private func createRoute(method: HTTPMethod, path: String, handler: HandlerType)
     let matcher = Matcher(path: path)
     return Route(method: method, pathMatcher: matcher, handler: handler)
 }
-

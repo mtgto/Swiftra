@@ -14,12 +14,12 @@ public struct Matcher {
     public init(path: String) {
         self.components = URL(fileURLWithPath: path).pathComponents
     }
-    
+
     public func match(path: String) -> Match {
         let components = URL(fileURLWithPath: path).pathComponents
         return self.match(lhs: self.components, rhs: components, params: [:])
     }
-    
+
     private func match(lhs: [String], rhs: [String], params: [String: String]) -> Match {
         if lhs.isEmpty && rhs.isEmpty {
             return .success(params)

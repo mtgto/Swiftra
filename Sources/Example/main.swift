@@ -8,11 +8,11 @@ let app = App {
     get("/") { req in
         .text("Hello, world!")
     }
-    
+
     get("/hello/:name") { req in
         .text("Hello \(req.params("name") ?? "guest")")
     }
-    
+
     futureGet("/future") { req in
         let promise = req.eventLoop.makePromise(of: String.self)
         promise.succeed("Hello from future")

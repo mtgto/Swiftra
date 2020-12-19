@@ -8,12 +8,12 @@ public struct Request {
     public let header: HTTPRequestHead
     public let eventLoop: EventLoop
     public var match: Match? = nil
-    
+
     init(header: HTTPRequestHead, eventLoop: EventLoop) {
         self.header = header
         self.eventLoop = eventLoop
     }
-    
+
     public func params(_ name: String) -> String? {
         if case .success(let params) = self.match {
             return params[name]

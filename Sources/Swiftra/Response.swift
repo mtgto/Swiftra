@@ -9,15 +9,15 @@ import NIOHTTP1
 public enum Response {
     case text(String, detail: ResponseDetail = ResponseDetail())
     case data(Data, detail: ResponseDetail = ResponseDetail(contentType: "application/octet-stream"))
-    
+
     public init(text: String, status: HTTPResponseStatus = .ok, contentType: String = "text/plain") {
         self = .text(text, detail: ResponseDetail(status: status, contentType: contentType))
     }
-    
+
     public init(data: Data, status: HTTPResponseStatus = .ok, contentType: String = "application/octet-stream") {
         self = .data(data, detail: ResponseDetail(status: status, contentType: contentType))
     }
-    
+
     public init?<T: Encodable>(json: T, status: HTTPResponseStatus = .ok, contentType: String = "application/json") {
         let jsonEncoder = JSONEncoder()
         if let data = try? jsonEncoder.encode(json) {
@@ -26,17 +26,17 @@ public enum Response {
             return nil
         }
     }
-    
+
     public struct ResponseDetail {
         public var status: HTTPResponseStatus = .ok
         public var contentType: String = "text/plain"
-        
+
         public init(status: HTTPResponseStatus = .ok, contentType: String = "text/plain") {
             self.status = status
             self.contentType = contentType
         }
     }
-    
+
     func createHeaders() -> [(String, String)] {
         let contentType: String
         switch self {

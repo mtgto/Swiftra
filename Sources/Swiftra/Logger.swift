@@ -4,11 +4,11 @@
 import Foundation
 
 #if DEBUG
-let log = Logger()
+    let log = Logger()
 
-struct Logger {
-    func info(_ message: String, _ args: Any...) {
-        print(message, args)
+    struct Logger {
+        func info(_ message: String, _ args: Any...) {
+            print(message, args)
+        }
     }
-}
 #endif

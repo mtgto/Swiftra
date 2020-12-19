@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import XCTest
+
 @testable import Swiftra
 
 class MatcherTests: XCTestCase {
@@ -14,7 +15,7 @@ class MatcherTests: XCTestCase {
         XCTAssertEqual(matcher.match(path: "/foo/bar"), .failure)
         XCTAssertEqual(matcher.match(path: "/foo/bar/baz/aaa"), .failure)
     }
-    
+
     func testMatcherWithParams() {
         let matcher = Matcher(path: "/foo/:bar/baz")
         XCTAssertEqual(matcher.match(path: "/foo/bar/baz"), .success(["bar": "bar"]))

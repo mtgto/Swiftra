@@ -3,6 +3,7 @@
 
 import NIO
 import XCTest
+
 @testable import Swiftra
 
 class ResponseTests: XCTestCase {
@@ -10,11 +11,14 @@ class ResponseTests: XCTestCase {
     func testResponse() {
         let textResponse: Response = .text("Hello, world")
         XCTAssertTrue(textResponse.createHeaders().contains(where: { ("Content-Type", "text/plain") == $0 }))
-        guard let jsonResponse = Response(json: ["hoge": ["fuga", "piyo"]]) else { XCTFail(); return }
+        guard let jsonResponse = Response(json: ["hoge": ["fuga", "piyo"]]) else {
+            XCTFail()
+            return
+        }
         XCTAssertTrue(jsonResponse.createHeaders().contains(where: { ("Content-Type", "application/json") == $0 }))
     }
 
     static var allTests = [
-        ("testResponse", testResponse),
+        ("testResponse", testResponse)
     ]
 }

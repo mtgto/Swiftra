@@ -14,9 +14,6 @@ open class App {
 
     public func addRoutes(@DSLMaker routing: () -> [Route]) {
         self.routes = self.routes + routing()
-        #if DEBUG
-            log.info("App.init")
-        #endif
     }
 
     public func start(_ port: Int, host: String = "0.0.0.0") throws {
@@ -112,14 +109,8 @@ open class App {
                 }
                 break
             case .body(buffer: let body):
-                #if DEBUG
-                    log.info("Body:", body)
-                #endif
                 break
             case .end:
-                #if DEBUG
-                    log.info("END")
-                #endif
                 break
             }
         }

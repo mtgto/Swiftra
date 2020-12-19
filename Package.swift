@@ -1,10 +1,14 @@
 // swift-tools-version:5.3
-// The swift-tools-version declares the minimum version of Swift required to build this package.
+// SPDX-FileCopyrightText: 2020 mtgto <hogerappa@gmail.com>
+// SPDX-License-Identifier: Apache-2.0
 
 import PackageDescription
 
 let package = Package(
     name: "Swiftra",
+    platforms: [
+        .macOS(.v10_14), .iOS(.v13),
+    ],
     products: [
         .library(
             name: "Swiftra",

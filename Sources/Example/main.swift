@@ -32,6 +32,18 @@ let app = App {
     */
 }
 
-try! app.run(1337)
-
-RunLoop.main.run()
+try! app.start(1337)
+while let line = readLine() {
+    if line == "exit" {
+        app.stop { (error) in
+            if let error = error {
+                print(error)
+                exit(EXIT_FAILURE)
+            } else {
+                print("shutdown")
+                exit(EXIT_SUCCESS)
+            }
+        }
+    }
+}
+//RunLoop.main.run()

@@ -15,7 +15,7 @@ open class App {
         #endif
     }
 
-    public func run(_ port: Int) throws {
+    public func start(_ port: Int) throws {
         let reuseAddrOpt = ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR)
         let bootstrap = ServerBootstrap(group: self.loopGroup)
             .serverChannelOption(ChannelOptions.backlog, value: 256)
@@ -35,6 +35,10 @@ open class App {
             log.info("Server running on:", serverChannel.localAddress!)
         #endif
         //try serverChannel.closeFuture.wait()
+    }
+
+    public func stop(_ callback: @escaping (Error?) -> Void) {
+        self.loopGroup.shutdownGracefully(callback)
     }
 
     final class HTTPHandler: ChannelInboundHandler {

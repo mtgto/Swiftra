@@ -11,7 +11,7 @@ let app = App {
 
     // path parameters
     get("/hello/:name") { req in
-        .text("Hello \(req.params("name") ?? "guest")")
+        .text("Hello \(req.params("name", default: "guest"))")
     }
 
     // convert Encodable value into JSON
@@ -51,5 +51,5 @@ while let line = readLine() {
     }
 }
 
-// try! app.start(1337)
+// try! app.start(1337, host: "localhost")
 // RunLoop.main.run()

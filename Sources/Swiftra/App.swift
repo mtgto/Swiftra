@@ -19,7 +19,7 @@ open class App {
         #endif
     }
 
-    public func start(_ port: Int) throws {
+    public func start(_ port: Int, host: String = "0.0.0.0") throws {
         let reuseAddrOpt = ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR)
         let bootstrap = ServerBootstrap(group: self.loopGroup)
             .serverChannelOption(ChannelOptions.backlog, value: 256)
@@ -34,7 +34,7 @@ open class App {
             .childChannelOption(ChannelOptions.maxMessagesPerRead, value: 1)
 
         // TODO: host should be customizable
-        let serverChannel = try bootstrap.bind(host: "localhost", port: port).wait()
+        let serverChannel = try bootstrap.bind(host: host, port: port).wait()
         #if DEBUG
             log.info("Server running on:", serverChannel.localAddress!)
         #endif

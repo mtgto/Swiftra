@@ -20,4 +20,8 @@ public struct Request {
         }
         return nil
     }
+
+    public func params(_ name: String, default defaultValue: String) -> String {
+        return self.params(name) ?? defaultValue
+    }
 }

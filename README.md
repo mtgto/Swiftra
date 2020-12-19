@@ -16,7 +16,7 @@ let app = App {
 
     // path parameters
     get("/hello/:name") { req in
-        .text("Hello \(req.params("name") ?? "guest")")
+        .text("Hello \(req.params("name", default: "guest"))")
     }
     
     // convert Encodable value into JSON
@@ -42,6 +42,8 @@ app.addRoutes {
 }
 
 try! app.start(1337)
+// You can customize bind address
+// try! app.start(1337, host: "localhost")
 ```
 
 ## Installation

@@ -3,6 +3,7 @@ repos:
   hooks:
   - id: swift-format
     name: swift-format
-    entry: swift-format --configuration .swift-format --in-place
     language: system
+    entry: swift-format
+    args: [--configuration, .swift-format, --in-place]
     types: [swift]

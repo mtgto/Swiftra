@@ -18,18 +18,7 @@ let app = App {
         promise.succeed("Hello from future")
         return promise.futureResult.map { .text($0) }
     }
-    /*
-    get("/customize") { req in
-        status(200)
-        contentType("application/json")
-        json(["Hello"])
-    }
-    */
-    /*
-    get("/customize") { req in
-        .json(["Hello"], status: 200, contentType: "application/json")
-    }
-    */
+
 }
 
 try! app.start(1337)

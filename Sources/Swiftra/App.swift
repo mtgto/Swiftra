@@ -5,7 +5,7 @@ import NIO
 import NIOHTTP1
 
 open class App {
-    private let loopGroup = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
+    private var loopGroup: EventLoopGroup! = nil
     private var routes: [Route]
 
     public init(@DSLMaker routing: () -> [Route] = { () in [] }) {
@@ -17,6 +17,7 @@ open class App {
     }
 
     public func start(_ port: Int, host: String = "0.0.0.0") throws {
+        self.loopGroup = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
         let reuseAddrOpt = ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR)
         let bootstrap = ServerBootstrap(group: self.loopGroup)
             .serverChannelOption(ChannelOptions.backlog, value: 256)
@@ -39,7 +40,10 @@ open class App {
     }
 
     public func stop(_ callback: @escaping (Error?) -> Void) {
-        self.loopGroup.shutdownGracefully(callback)
+        self.loopGroup.shutdownGracefully { (error) in
+            self.loopGroup = nil
+            callback(error)
+        }
     }
 
     final class HTTPHandler: ChannelInboundHandler {

@@ -9,6 +9,10 @@ let app = App {
         .text("Hello, world!")
     }
 
+    get("/html") { req in
+        .text("<html><body>Hello from Swiftra</body></html>", contentType: ContentType.textHtml.rawValue)
+    }
+
     // path parameters
     get("/hello/:name") { req in
         .text("Hello \(req.params("name", default: "guest"))")

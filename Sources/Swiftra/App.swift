@@ -31,7 +31,6 @@ open class App {
             .childChannelOption(reuseAddrOpt, value: 1)
             .childChannelOption(ChannelOptions.maxMessagesPerRead, value: 1)
 
-        // TODO: host should be customizable
         let serverChannel = try bootstrap.bind(host: host, port: port).wait()
         #if DEBUG
             log.info("Server running on:", serverChannel.localAddress!)
@@ -49,11 +48,16 @@ open class App {
     final class HTTPHandler: ChannelInboundHandler {
         typealias InboundIn = HTTPServerRequestPart
 
-        let app: App
+        private let app: App
+        private var request: Request! = nil
         private var buffer: ByteBuffer! = nil
 
         init(_ app: App) {
             self.app = app
+        }
+
+        func handlerAdded(context: ChannelHandlerContext) {
+            self.buffer = context.channel.allocator.buffer(capacity: 0)
         }
 
         func handleResponse(channel: Channel, response: Response) {
@@ -73,20 +77,27 @@ open class App {
 
             switch reqPart {
             case .head(let header):
+                self.buffer.clear()
+                self.request = Request(header: header, remoteAddress: context.remoteAddress, eventLoop: context.eventLoop)
+                break
+            case .body(buffer: var body):
+                self.buffer.writeBuffer(&body)
+                break
+            case .end:
                 let channel = context.channel
-                var request = Request(header: header, eventLoop: context.eventLoop)
                 let found = self.app.routes.contains { (route) -> Bool in
-                    if route.method != request.header.method {
+                    if route.method != self.request.header.method {
                         return false
                     }
                     // TODO: parse uri to path and querystring and hash
-                    if case .success(let match) = route.pathMatcher.match(path: request.header.uri) {
-                        request.match = .success(match)
+                    if case .success(let match) = route.pathMatcher.match(path: self.request.path) {
+                        self.request.body = self.buffer
+                        self.request.match = .success(match)
                         if case .normal(let handler) = route.handler {
-                            let response = handler(request)
+                            let response = handler(self.request)
                             self.handleResponse(channel: channel, response: response)
                         } else if case .future(let handler) = route.handler {
-                            handler(request).whenComplete { (result) in
+                            handler(self.request).whenComplete { (result) in
                                 if case .success(let response) = result {
                                     self.handleResponse(channel: channel, response: response)
                                 } else if case .failure(let error) = result {
@@ -111,10 +122,6 @@ open class App {
                         context.channel.close()
                     }
                 }
-                break
-            case .body(buffer: let body):
-                break
-            case .end:
                 break
             }
         }

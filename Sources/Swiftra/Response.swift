@@ -7,18 +7,18 @@ import NIOHTTP1
 
 // ステータスコードとか指定したいときに使う
 public enum Response {
-    case text(String, detail: ResponseDetail = ResponseDetail())
-    case data(Data, detail: ResponseDetail = ResponseDetail(contentType: "application/octet-stream"))
+    case text(String, status: HTTPResponseStatus = .ok, contentType: String = ContentType.textPlain.rawValue)
+    case data(Data, status: HTTPResponseStatus = .ok, contentType: String = ContentType.applicationOctetStream.rawValue)
 
-    public init(text: String, status: HTTPResponseStatus = .ok, contentType: String = "text/plain") {
-        self = .text(text, detail: ResponseDetail(status: status, contentType: contentType))
+    public init(text: String, status: HTTPResponseStatus = .ok, contentType: String = ContentType.textPlain.rawValue) {
+        self = .text(text, status: status, contentType: contentType)
     }
 
-    public init(data: Data, status: HTTPResponseStatus = .ok, contentType: String = "application/octet-stream") {
-        self = .data(data, detail: ResponseDetail(status: status, contentType: contentType))
+    public init(data: Data, status: HTTPResponseStatus = .ok, contentType: String = ContentType.applicationOctetStream.rawValue) {
+        self = .data(data, status: status, contentType: contentType)
     }
 
-    public init?<T: Encodable>(json: T, status: HTTPResponseStatus = .ok, contentType: String = "application/json") {
+    public init?<T: Encodable>(json: T, status: HTTPResponseStatus = .ok, contentType: String = ContentType.applicationJson.rawValue) {
         let jsonEncoder = JSONEncoder()
         if let data = try? jsonEncoder.encode(json) {
             self.init(data: data, status: status, contentType: contentType)
@@ -27,30 +27,20 @@ public enum Response {
         }
     }
 
-    public struct ResponseDetail {
-        public var status: HTTPResponseStatus = .ok
-        public var contentType: String = "text/plain"
-
-        public init(status: HTTPResponseStatus = .ok, contentType: String = "text/plain") {
-            self.status = status
-            self.contentType = contentType
-        }
-    }
-
     func createHeaders() -> [(String, String)] {
         let contentType: String
         switch self {
-        case .text(_, let detail), .data(_, let detail):
-            contentType = detail.contentType
+        case .text(_, status: _, contentType: let ct), .data(_, status: _, contentType: let ct):
+            contentType = ct
         }
         return [("Content-Type", contentType)]
     }
 
     func data() -> Data {
         switch self {
-        case .text(let text, _):
+        case .text(let text, status: _, contentType: _):
             return text.data(using: .utf8) ?? Data()
-        case .data(let data, _):
+        case .data(let data, status: _, contentType: _):
             return data
         }
     }

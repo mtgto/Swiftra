@@ -9,7 +9,7 @@ import XCTest
 class MatcherTests: XCTestCase {
 
     func testMatcher() {
-        let matcher = Matcher(path: "/foo/bar/baz")
+        let matcher = PathMatcher(method: .GET, path: "/foo/bar/baz")
         XCTAssertEqual(matcher.match(path: "/foo/bar/baz"), .success([:]))
         XCTAssertEqual(matcher.match(path: "/foo/bar/baz/"), .success([:]))
         XCTAssertEqual(matcher.match(path: "//foo///bar////baz"), .success([:]))
@@ -20,10 +20,11 @@ class MatcherTests: XCTestCase {
     }
 
     func testMatcherWithParams() {
-        let matcher = Matcher(path: "/foo/:bar/baz")
+        let matcher = PathMatcher(method: .GET, path: "/foo/:bar/baz")
         XCTAssertEqual(matcher.match(path: "/foo/bar/baz"), .success(["bar": "bar"]))
         XCTAssertEqual(matcher.match(path: "/foo/barbarbar/baz"), .success(["bar": "barbarbar"]))
-        XCTAssertEqual(Matcher(path: "/:foo/:bar/:baz").match(path: "/foo/bar/baz"), .success(["foo": "foo", "bar": "bar", "baz": "baz"]))
+        XCTAssertEqual(
+            PathMatcher(method: .GET, path: "/:foo/:bar/:baz").match(path: "/foo/bar/baz"), .success(["foo": "foo", "bar": "bar", "baz": "baz"]))
         guard let components = URLComponents(string: "/foo/%E3%81%93%E3%82%93%E3%81%AB%E3%81%A1%E3%81%AF/baz") else {
             XCTFail("Fail to parse encoded url")
             return

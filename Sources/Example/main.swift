@@ -25,11 +25,16 @@ let app = App {
 
     // asynchronous
     futureGet("/future") { req in
-        let promise = req.eventLoop.makePromise(of: String.self)
+        let promise = req.makePromise(of: String.self)
         _ = req.eventLoop.scheduleTask(in: .seconds(1)) {
             promise.succeed("Hello from future")
         }
         return promise.futureResult.map { .text($0) }
+    }
+
+    // No route matches
+    notFound { req in
+        .text("Not Found")
     }
 }
 

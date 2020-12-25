@@ -41,4 +41,8 @@ public struct Request {
     public func params(_ name: String, default defaultValue: String) -> String {
         return self.params(name) ?? defaultValue
     }
+
+    public func makePromise<T>(of type: T.Type = T.self) -> EventLoopPromise<T> {
+        return self.eventLoop.makePromise(of: type)
+    }
 }

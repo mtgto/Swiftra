@@ -85,12 +85,9 @@ open class App {
                 break
             case .end:
                 let channel = context.channel
-                let found = self.app.routes.contains { (route) -> Bool in
-                    if route.method != self.request.header.method {
-                        return false
-                    }
+                _ = self.app.routes.contains { (route) -> Bool in
                     // TODO: parse uri to path and querystring and hash
-                    if case .success(let match) = route.pathMatcher.match(path: self.request.path) {
+                    if case .success(let match) = route.matcher.match(method: self.request.header.method, path: self.request.path) {
                         self.request.body = self.buffer
                         self.request.match = .success(match)
                         if case .normal(let handler) = route.handler {
@@ -112,17 +109,6 @@ open class App {
                     }
                     return false
                 }
-                if !found {
-                    // TODO: Add notFound to DSL to customize.
-                    let head = HTTPResponseHead(version: .init(major: 1, minor: 1), status: .notFound, headers: HTTPHeaders())
-                    _ = context.channel.writeAndFlush(HTTPServerResponsePart.head(head))
-                    let buffer = context.channel.allocator.buffer(string: "Not Found")
-                    _ = context.channel.writeAndFlush(HTTPServerResponsePart.body(.byteBuffer(buffer)))
-                    _ = context.channel.writeAndFlush(HTTPServerResponsePart.end(nil)).map {
-                        context.channel.close()
-                    }
-                }
-                break
             }
         }
     }

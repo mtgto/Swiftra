@@ -11,7 +11,7 @@ public struct Request {
     public let header: HTTPRequestHead
     public let remoteAddress: SocketAddress?
     public let eventLoop: EventLoop
-    public var match: Match? = nil
+    internal(set) public var match: Match? = nil
     internal(set) public var body: ByteBuffer? = nil
 
     init(header: HTTPRequestHead, remoteAddress: SocketAddress?, eventLoop: EventLoop) {

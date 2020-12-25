@@ -1,6 +1,15 @@
 CHANGELOG
 ====
 
+## v0.2.0 (2020-12-26)
+
+### Added
+
+- Support query params
+- Add error handler
+- Add default handler to handle no route is matched
+- Add tests of Request
+
 ## v0.1.1 (2020-12-20)
 
 ### Changed

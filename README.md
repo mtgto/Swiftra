@@ -9,16 +9,22 @@ Swiftra is a small wrapper on [SwiftNIO](https://github.com/apple/swift-nio).
 ```swift
 import Swiftra
 
+struct ExampleError: Error {}
+
 let app = App {
     get("/") { req in
         .text("Hello, world!")
+    }
+
+    get("/html") { req in
+        .text("<html><body>Hello from Swiftra</body></html>", contentType: ContentType.textHtml.rawValue)
     }
 
     // path parameters
     get("/hello/:name") { req in
         .text("Hello \(req.params("name", default: "guest"))")
     }
-    
+
     // convert Encodable value into JSON
     get("/json") { req in
         Response(json: ["Hello": "World!"])!
@@ -26,11 +32,26 @@ let app = App {
 
     // asynchronous
     futureGet("/future") { req in
-        let promise = req.eventLoop.makePromise(of: String.self)
+        let promise = req.makePromise(of: String.self)
         _ = req.eventLoop.scheduleTask(in: .seconds(1)) {
             promise.succeed("Hello from future")
         }
         return promise.futureResult.map { .text($0) }
+    }
+
+    // No route matches
+    notFound { req in
+        .text("Not Found", status: .notFound)
+    }
+
+    // Example of error handling. See also below `error`
+    get("/error") { req in
+        throw ExampleError()
+    }
+
+    // unhandled error handler
+    error { req, error in
+        .text("Error", status: .internalServerError)
     }
 }
 
@@ -58,17 +79,18 @@ Add `https://github.com/mtgto/Swiftra` to your dependencies of Swift Package.
 ## Roadmap to v1.0.0
 
 - [ ] Helper to access components of request header
-  - [ ] query string
+  - [x] query string
   - [ ] fragment
   - [ ] Cookie
 - [ ] HTTP methods except for `GET`
 - [ ] JSON request/response
-- [ ] Error handling
+- [x] Error handling
+- [ ] File upload
 - [ ] More performance
 
 ## Contributing
 
-Please format swift code with [swift-format](https://github.com/apple/swift-format) before send your contribution.
+Format swift code with [swift-format](https://github.com/apple/swift-format) before send your contribution.
 
 ```console
 $ swift-format --configuration .swift-format --in-place YourAwesomeCode.swift

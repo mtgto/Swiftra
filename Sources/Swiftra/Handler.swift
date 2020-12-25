@@ -3,10 +3,12 @@
 
 import NIO
 
-public typealias Handler = (Request) -> Response
+public typealias Handler = (Request) throws -> Response
 public typealias FutureHandler = (Request) -> EventLoopFuture<Response>
+public typealias ErrorHandler = (Request, Error) -> Response
 
 public enum HandlerType {
-    case normal((Request) -> Response)
-    case future((Request) -> EventLoopFuture<Response>)
+    case normal(Handler)
+    case future(FutureHandler)
+    case error(ErrorHandler)
 }

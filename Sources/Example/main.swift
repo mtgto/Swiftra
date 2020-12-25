@@ -4,6 +4,8 @@
 import Foundation
 import Swiftra
 
+struct ExampleError: Error {}
+
 let app = App {
     get("/") { req in
         .text("Hello, world!")
@@ -34,7 +36,17 @@ let app = App {
 
     // No route matches
     notFound { req in
-        .text("Not Found")
+        .text("Not Found", status: .notFound)
+    }
+
+    // Example of error handling. See also below `error`
+    get("/error") { req in
+        throw ExampleError()
+    }
+
+    // unhandled error handler
+    error { req, error in
+        .text("Error", status: .internalServerError)
     }
 }
 

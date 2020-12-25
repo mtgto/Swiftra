@@ -7,9 +7,28 @@ import NIOHTTP1
 open class App {
     private var loopGroup: EventLoopGroup! = nil
     private var routes: [Route]
+    private var defaultHandler: Handler? = nil
+    private var errorHandler: ErrorHandler? = nil
 
     public init(@DSLMaker routing: () -> [Route] = { () in [] }) {
-        self.routes = routing()
+        var routes: [Route] = []
+        for route in routing() {
+            switch route.handler {
+            case .error(let handler):
+                self.errorHandler = handler
+                break
+            case .normal(let handler):
+                if route.matcher is AllMatcher {
+                    self.defaultHandler = handler
+                } else {
+                    routes.append(route)
+                }
+                break
+            case .future(_):
+                routes.append(route)
+            }
+        }
+        self.routes = routes
     }
 
     public func addRoutes(@DSLMaker routing: () -> [Route]) {
@@ -85,29 +104,42 @@ open class App {
                 break
             case .end:
                 let channel = context.channel
-                _ = self.app.routes.contains { (route) -> Bool in
-                    // TODO: parse uri to path and querystring and hash
-                    if case .success(let match) = route.matcher.match(method: self.request.header.method, path: self.request.path) {
-                        self.request.body = self.buffer
-                        self.request.match = .success(match)
-                        if case .normal(let handler) = route.handler {
-                            let response = handler(self.request)
-                            self.handleResponse(channel: channel, response: response)
-                        } else if case .future(let handler) = route.handler {
-                            handler(self.request).whenComplete { (result) in
-                                if case .success(let response) = result {
-                                    self.handleResponse(channel: channel, response: response)
-                                } else if case .failure(let error) = result {
-                                    // TODO: Call error handler
-                                    #if DEBUG
-                                        log.info("Error:", error)
-                                    #endif
+                do {
+                    var found: Bool = false
+                    for route in self.app.routes {
+                        if case .success(let match) = route.matcher.match(method: self.request.header.method, path: self.request.path) {
+                            self.request.body = self.buffer
+                            self.request.match = .success(match)
+                            if case .normal(let handler) = route.handler {
+                                let response = try handler(self.request)
+                                self.handleResponse(channel: channel, response: response)
+                            } else if case .future(let handler) = route.handler {
+                                handler(self.request).whenComplete { (result) in
+                                    if case .success(let response) = result {
+                                        self.handleResponse(channel: channel, response: response)
+                                    } else if case .failure(let error) = result {
+                                        // TODO: Call error handler
+                                        #if DEBUG
+                                            log.info("Error:", error)
+                                        #endif
+                                    }
                                 }
                             }
+                            found = true
+                            break
                         }
-                        return true
                     }
-                    return false
+                    if !found {
+                        if let handler = self.app.defaultHandler {
+                            let response = try handler(self.request)
+                            self.handleResponse(channel: channel, response: response)
+                        }
+                    }
+                } catch {
+                    if let handler = self.app.errorHandler {
+                        let response = handler(self.request, error)
+                        self.handleResponse(channel: channel, response: response)
+                    }
                 }
             }
         }

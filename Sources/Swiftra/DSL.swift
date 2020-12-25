@@ -35,9 +35,16 @@ public func futureHandle(_ method: HTTPMethod, _ path: String, handler: @escapin
     return createRoute(method: method, path: path, handler: .future(handler))
 }
 
+// Handler for no route matching
 public func notFound(handler: @escaping Handler) -> Route {
     let matcher = AllMatcher()
     return Route(matcher: matcher, handler: .normal(handler))
+}
+
+// Handler for error handling
+public func error(handler: @escaping ErrorHandler) -> Route {
+    let matcher = AllMatcher()
+    return Route(matcher: matcher, handler: .error(handler))
 }
 
 private func createRoute(method: HTTPMethod, path: String, handler: HandlerType) -> Route {

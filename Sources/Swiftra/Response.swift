@@ -44,4 +44,13 @@ public enum Response {
             return data
         }
     }
+
+    func status() -> HTTPResponseStatus {
+        switch self {
+        case .text(_, let status, contentType: _):
+            return status
+        case .data(_, let status, contentType: _):
+            return status
+        }
+    }
 }

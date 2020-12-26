@@ -1,6 +1,12 @@
 CHANGELOG
 ====
 
+## v0.2.1 (2020-12-26)
+
+### Changed
+
+- Fix status code of response code is always 200 OK
+
 ## v0.2.0 (2020-12-26)
 
 ### Added

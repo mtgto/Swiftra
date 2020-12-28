@@ -7,4 +7,8 @@ public enum ContentType: String {
     case applicationWwwFormUrlencoded = "application/x-www-form-urlencoded"
     case textHtml = "text/html"
     case textPlain = "text/plain"
+
+    public func withCharset(_ charset: String = "utf-8") -> String {
+        self.rawValue + "; charset=\(charset)"
+    }
 }

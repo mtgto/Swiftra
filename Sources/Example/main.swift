@@ -12,7 +12,7 @@ let app = App {
     }
 
     get("/html") { req in
-        .text("<html><body>Hello from Swiftra</body></html>", contentType: ContentType.textHtml.rawValue)
+        .text("<html><body>Hello from Swiftra</body></html>", contentType: ContentType.textHtml.withCharset())
     }
 
     // path parameters

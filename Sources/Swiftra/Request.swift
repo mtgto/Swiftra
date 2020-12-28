@@ -28,6 +28,7 @@ public struct Request {
         self.eventLoop = eventLoop
     }
 
+    // Get path parameter or query parameter from request URI
     public func params(_ name: String) -> String? {
         if case .success(let params) = self.match {
             return params[name]
@@ -38,6 +39,7 @@ public struct Request {
         return nil
     }
 
+    // Get path parameter or query parameter from request URI
     public func params(_ name: String, default defaultValue: String) -> String {
         return self.params(name) ?? defaultValue
     }

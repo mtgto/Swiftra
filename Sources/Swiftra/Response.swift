@@ -7,12 +7,12 @@ import NIOHTTP1
 
 // ステータスコードとか指定したいときに使う
 public enum Response {
-    case text(String, status: HTTPResponseStatus = .ok, contentType: String = ContentType.textPlain.rawValue, headers: [(String, String)] = [])
+    case text(String, status: HTTPResponseStatus = .ok, contentType: String = ContentType.textPlain.withCharset(), headers: [(String, String)] = [])
     case data(
         Data, status: HTTPResponseStatus = .ok, contentType: String = ContentType.applicationOctetStream.rawValue, headers: [(String, String)] = [])
 
     public init(
-        text: String, status: HTTPResponseStatus = .ok, contentType: String = ContentType.textPlain.rawValue, headers: [(String, String)] = []
+        text: String, status: HTTPResponseStatus = .ok, contentType: String = ContentType.textPlain.withCharset(), headers: [(String, String)] = []
     ) {
         self = .text(text, status: status, contentType: contentType, headers: headers)
     }
@@ -24,7 +24,7 @@ public enum Response {
         self = .data(data, status: status, contentType: contentType, headers: headers)
     }
 
-    public init?<T: Encodable>(json: T, status: HTTPResponseStatus = .ok, contentType: String = ContentType.applicationJson.rawValue) {
+    public init?<T: Encodable>(json: T, status: HTTPResponseStatus = .ok, contentType: String = ContentType.applicationJson.withCharset()) {
         let jsonEncoder = JSONEncoder()
         if let data = try? jsonEncoder.encode(json) {
             self.init(data: data, status: status, contentType: contentType)

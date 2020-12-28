@@ -5,6 +5,7 @@ import NIO
 import NIOHTTP1
 
 open class App {
+    public var defaultHeaders: [(String, String)] = []
     private var loopGroup: EventLoopGroup! = nil
     private var routes: [Route]
     private var defaultHandler: Handler? = nil
@@ -80,9 +81,9 @@ open class App {
             self.buffer = context.channel.allocator.buffer(capacity: 0)
         }
 
-        func handleResponse(channel: Channel, response: Response) {
+        private func handleResponse(channel: Channel, response: Response) {
             let responseData = response.data()
-            let headers = response.createHeaders() + [("Content-Length", "\(responseData.count)")]
+            let headers = self.app.defaultHeaders + response.createHeaders() + [("Content-Length", "\(responseData.count)")]
             let head = HTTPResponseHead(version: .init(major: 1, minor: 1), status: response.status(), headers: HTTPHeaders(headers))
             _ = channel.write(HTTPServerResponsePart.head(head))
             let buffer = channel.allocator.buffer(bytes: responseData)

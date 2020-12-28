@@ -57,6 +57,9 @@ app.addRoutes {
     }
 }
 
+// Set default response headers
+app.defaultHeaders = [("Server", "SwiftraExample/1.0.0")]
+
 try! app.start(1337)
 while let line = readLine() {
     if line == "exit" {

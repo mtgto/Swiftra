@@ -1,5 +1,9 @@
 # Swiftra
 
+[![Cocoapods](https://img.shields.io/cocoapods/v/Swiftra)](https://cocoapods.org/pods/Swiftra)
+![Platforms](https://img.shields.io/cocoapods/p/Swiftra)
+[![build status](https://github.com/mtgto/Swiftra/workflows/Swift/badge.svg)](https://github.com/mtgto/Swiftra/actions?query=workflow%3ASwift)
+
 A tiny Sinatra-like web framework for Swift.
 
 Swiftra is a small wrapper on [SwiftNIO](https://github.com/apple/swift-nio).
@@ -72,12 +76,19 @@ try! app.start(1337)
 
 ## Installation
 
+### Swift Package Manager (SPM)
+
 Add `https://github.com/mtgto/Swiftra` to your dependencies of Swift Package.
+
+### Cocoapods
+
+Add `pod 'Swiftra', '~> 0.3'` to your Podfile.
 
 ## Features
 
 - Routing
 - Access path parameter(s)
+- Access query paramter(s)
 
 ## Roadmap to v1.0.0
 
@@ -85,10 +96,13 @@ Add `https://github.com/mtgto/Swiftra` to your dependencies of Swift Package.
   - [x] query string
   - [ ] fragment
   - [ ] Cookie
+- [ ] Helper to access request body
+  - [ ] x-www-form-urlencoded data
+  - [ ] JSON request
 - [ ] HTTP methods except for `GET`
-- [ ] JSON request/response
 - [x] Error handling
 - [ ] File upload
+  - [ ] Large file upload
 - [ ] More performance
 
 ## Contributing

@@ -11,28 +11,29 @@ open class App {
     private var errorHandler: ErrorHandler? = nil
 
     public init(@DSLMaker routing: () -> [Route] = { () in [] }) {
-        var routes: [Route] = []
-        for route in routing() {
+        self.routes = []
+        self.addRoutes(routes: routing())
+    }
+
+    public func addRoutes(@DSLMaker routing: () -> [Route]) {
+        self.addRoutes(routes: routing())
+    }
+
+    private func addRoutes(routes: [Route]) {
+        for route in routes {
             switch route.handler {
             case .error(let handler):
                 self.errorHandler = handler
-                break
             case .normal(let handler):
                 if route.matcher is AllMatcher {
                     self.defaultHandler = handler
                 } else {
-                    routes.append(route)
+                    self.routes.append(route)
                 }
-                break
             case .future(_):
-                routes.append(route)
+                self.routes.append(route)
             }
         }
-        self.routes = routes
-    }
-
-    public func addRoutes(@DSLMaker routing: () -> [Route]) {
-        self.routes = self.routes + routing()
     }
 
     public func start(_ port: Int, host: String = "0.0.0.0") throws {
@@ -98,10 +99,8 @@ open class App {
             case .head(let header):
                 self.buffer.clear()
                 self.request = Request(header: header, remoteAddress: context.remoteAddress, eventLoop: context.eventLoop)
-                break
             case .body(buffer: var body):
                 self.buffer.writeBuffer(&body)
-                break
             case .end:
                 let channel = context.channel
                 do {

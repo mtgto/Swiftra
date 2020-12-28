@@ -1,5 +1,15 @@
 CHANGELOG
 ====
+## v0.3.0 (2020-12-28)
+
+### Added
+
+- Add accessor to set response headers
+- Support default response headers
+
+### Changed
+
+- Set `charset=utf-8` to `Content-Type` header by default
 
 ## v0.2.1 (2020-12-26)
 

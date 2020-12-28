@@ -17,7 +17,7 @@ let app = App {
     }
 
     get("/html") { req in
-        .text("<html><body>Hello from Swiftra</body></html>", contentType: ContentType.textHtml.rawValue)
+        .text("<html><body>Hello from Swiftra</body></html>", contentType: ContentType.textHtml.withCharset())
     }
 
     // path parameters
@@ -61,6 +61,9 @@ app.addRoutes {
         .text("New route is added")
     }
 }
+
+// Set default response headers
+app.defaultHeaders = [("Server", "SwiftraExample/1.0.0")]
 
 try! app.start(1337)
 // You can customize bind address

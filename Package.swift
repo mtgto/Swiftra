@@ -27,5 +27,6 @@ let package = Package(
         .testTarget(
             name: "SwiftraTests",
             dependencies: ["Swiftra"]),
-    ]
+    ],
+    swiftLanguageVersions: [.v5]
 )

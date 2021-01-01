@@ -104,11 +104,11 @@ open class App {
                 self.buffer.writeBuffer(&body)
             case .end:
                 let channel = context.channel
+                self.request.body = self.buffer
                 do {
                     var found: Bool = false
                     for route in self.app.routes {
                         if case .success(let match) = route.matcher.match(method: self.request.header.method, path: self.request.path) {
-                            self.request.body = self.buffer
                             self.request.match = .success(match)
                             if case .normal(let handler) = route.handler {
                                 let response = try handler(self.request)
@@ -118,10 +118,19 @@ open class App {
                                     if case .success(let response) = result {
                                         self.handleResponse(channel: channel, response: response)
                                     } else if case .failure(let error) = result {
-                                        // TODO: Call error handler
                                         #if DEBUG
                                             log.info("Error:", error)
                                         #endif
+                                        if let handler = self.app.errorHandler {
+                                            let response = handler(self.request, error)
+                                            self.handleResponse(channel: channel, response: response)
+                                        } else {
+                                            self.handleResponse(
+                                                channel: channel,
+                                                response: .text(
+                                                    "Internal Server Error", status: .internalServerError,
+                                                    contentType: ContentType.textPlain.withCharset()))
+                                        }
                                     }
                                 }
                             }

@@ -1,5 +1,12 @@
 CHANGELOG
 ====
+## v0.3.1 (2021-01-01)
+
+### Changed
+
+- Call error handler for future handler
+- Add missing argument of headers to create json response
+
 ## v0.3.0 (2020-12-28)
 
 ### Added

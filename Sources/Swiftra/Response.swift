@@ -24,10 +24,12 @@ public enum Response {
         self = .data(data, status: status, contentType: contentType, headers: headers)
     }
 
-    public init?<T: Encodable>(json: T, status: HTTPResponseStatus = .ok, contentType: String = ContentType.applicationJson.withCharset()) {
+    public init?<T: Encodable>(
+        json: T, status: HTTPResponseStatus = .ok, contentType: String = ContentType.applicationJson.withCharset(), headers: [(String, String)] = []
+    ) {
         let jsonEncoder = JSONEncoder()
         if let data = try? jsonEncoder.encode(json) {
-            self.init(data: data, status: status, contentType: contentType)
+            self.init(data: data, status: status, contentType: contentType, headers: headers)
         } else {
             return nil
         }

@@ -84,7 +84,7 @@ open class App {
         private func handleResponse(channel: Channel, response: Response) {
             let responseData = response.data()
             let headers = self.app.defaultHeaders + response.createHeaders() + [("Content-Length", "\(responseData.count)")]
-            let head = HTTPResponseHead(version: .init(major: 1, minor: 1), status: response.status(), headers: HTTPHeaders(headers))
+            let head = HTTPResponseHead(version: .http1_1, status: response.status(), headers: HTTPHeaders(headers))
             _ = channel.write(HTTPServerResponsePart.head(head))
             let buffer = channel.allocator.buffer(bytes: responseData)
             _ = channel.write(HTTPServerResponsePart.body(.byteBuffer(buffer)))

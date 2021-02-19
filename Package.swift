@@ -15,7 +15,7 @@ let package = Package(
             targets: ["Swiftra"])
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-nio.git", "2.0.0"..<"3.0.0")
+        .package(url: "https://github.com/apple/swift-nio.git", "2.26.0"..<"3.0.0")
     ],
     targets: [
         .target(

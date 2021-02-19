@@ -47,4 +47,11 @@ public struct Request {
     public func makePromise<T>(of type: T.Type = T.self) -> EventLoopPromise<T> {
         return self.eventLoop.makePromise(of: type)
     }
+
+    public func data() -> Data? {
+        if let buffer = self.body, let bytes = buffer.getBytes(at: 0, length: buffer.readableBytes) {
+            return Data(bytes)
+        }
+        return nil
+    }
 }

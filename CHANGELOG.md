@@ -1,5 +1,16 @@
 CHANGELOG
 ====
+## v0.4.0 (2021-02-20)
+
+### Added
+
+- Add new method `Request.data()` to get request body
+
+### Changed
+
+- Update SwiftNIO to 2.26.0
+- Add Ubuntu to test environment
+
 ## v0.3.1 (2021-01-01)
 
 ### Changed

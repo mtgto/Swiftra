@@ -34,6 +34,15 @@ let app = App {
         return promise.futureResult.map { .text($0) }
     }
 
+    // asynchronous with error
+    futureGet("/future/error") { req in
+        let promise = req.makePromise(of: String.self)
+        _ = req.eventLoop.scheduleTask(in: .seconds(1)) {
+            promise.fail(ExampleError())
+        }
+        return promise.futureResult.map { _ in .text("This text is not printed") }
+    }
+
     // No route matches
     notFound { req in
         .text("Not Found", status: .notFound)

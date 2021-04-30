@@ -11,6 +11,7 @@ public enum Match: Equatable {
 
 public protocol Matcher {
     func match(method: HTTPMethod?, path: String) -> Match
+    func match(request: Request) -> Match
 }
 
 // TODO: Implements Hashable to use key of routing table
@@ -29,6 +30,10 @@ public struct PathMatcher: Matcher {
         }
         let components = URL(fileURLWithPath: path).pathComponents
         return self.match(lhs: self.components, rhs: components, params: [:])
+    }
+
+    public func match(request: Request) -> Match {
+        return self.match(method: request.header.method, path: request.path)
     }
 
     private func match(lhs: [String], rhs: [String], params: [String: String]) -> Match {
@@ -50,6 +55,10 @@ public struct PathMatcher: Matcher {
 
 public struct AllMatcher: Matcher {
     public func match(method: HTTPMethod? = nil, path: String) -> Match {
+        .success([:])
+    }
+
+    public func match(request: Request) -> Match {
         .success([:])
     }
 }

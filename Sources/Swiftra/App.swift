@@ -93,6 +93,17 @@ open class App {
             }
         }
 
+        private func handleError(_ error: Error, channel: Channel) {
+            if let handler = self.app.errorHandler {
+                let response = handler(self.request, error)
+                self.handleResponse(channel: channel, response: response)
+            } else {
+                self.handleResponse(
+                    channel: channel,
+                    response: .text("Internal Server Error", status: .internalServerError, contentType: ContentType.textPlain.withCharset()))
+            }
+        }
+
         func channelRead(context: ChannelHandlerContext, data: NIOAny) {
             let reqPart = unwrapInboundIn(data)
 
@@ -106,49 +117,36 @@ open class App {
                 let channel = context.channel
                 self.request.body = self.buffer
                 do {
-                    var found: Bool = false
-                    for route in self.app.routes {
-                        if case .success(let match) = route.matcher.match(method: self.request.header.method, path: self.request.path) {
-                            self.request.match = .success(match)
-                            if case .normal(let handler) = route.handler {
-                                let response = try handler(self.request)
-                                self.handleResponse(channel: channel, response: response)
-                            } else if case .future(let handler) = route.handler {
-                                handler(self.request).whenComplete { (result) in
-                                    if case .success(let response) = result {
-                                        self.handleResponse(channel: channel, response: response)
-                                    } else if case .failure(let error) = result {
-                                        #if DEBUG
-                                            log.info("Error:", error)
-                                        #endif
-                                        if let handler = self.app.errorHandler {
-                                            let response = handler(self.request, error)
-                                            self.handleResponse(channel: channel, response: response)
-                                        } else {
-                                            self.handleResponse(
-                                                channel: channel,
-                                                response: .text(
-                                                    "Internal Server Error", status: .internalServerError,
-                                                    contentType: ContentType.textPlain.withCharset()))
-                                        }
-                                    }
-                                }
+                    guard
+                        let route = self.app.routes.first(where: { route in
+                            if case .success(let match) = route.matcher.match(request: self.request) {
+                                self.request.match = .success(match)
+                                return true
+                            } else {
+                                return false
                             }
-                            found = true
-                            break
-                        }
-                    }
-                    if !found {
+                        })
+                    else {
                         if let handler = self.app.defaultHandler {
                             let response = try handler(self.request)
                             self.handleResponse(channel: channel, response: response)
                         }
+                        return
+                    }
+                    if case .normal(let handler) = route.handler {
+                        let response = try handler(self.request)
+                        self.handleResponse(channel: channel, response: response)
+                    } else if case .future(let handler) = route.handler {
+                        handler(self.request).whenComplete { (result) in
+                            if case .success(let response) = result {
+                                self.handleResponse(channel: channel, response: response)
+                            } else if case .failure(let error) = result {
+                                self.handleError(error, channel: channel)
+                            }
+                        }
                     }
                 } catch {
-                    if let handler = self.app.errorHandler {
-                        let response = handler(self.request, error)
-                        self.handleResponse(channel: channel, response: response)
-                    }
+                    self.handleError(error, channel: channel)
                 }
             }
         }

@@ -5,11 +5,19 @@ import Foundation
 import NIO
 import NIOHTTP1
 
-@_functionBuilder public struct DSLMaker {
-    public static func buildBlock(_ routes: Route...) -> [Route] {
-        return routes
+#if swift(>=5.4)
+    @resultBuilder public struct DSLMaker {
+        public static func buildBlock(_ routes: Route...) -> [Route] {
+            return routes
+        }
     }
-}
+#else
+    @_functionBuilder public struct DSLMaker {
+        public static func buildBlock(_ routes: Route...) -> [Route] {
+            return routes
+        }
+    }
+#endif
 
 public func get(_ path: String, handler: @escaping Handler) -> Route {
     return createRoute(method: .GET, path: path, handler: .normal(handler))

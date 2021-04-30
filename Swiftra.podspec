@@ -13,5 +13,5 @@ Pod::Spec.new do |spec|
   spec.source       = { :git => "https://github.com/mtgto/Swiftra.git", :tag => "#{spec.version}" }
   spec.source_files  = "Sources/Swiftra/*.swift"
   spec.swift_version = '5.0'
-  spec.dependency "SwiftNIOHTTP1", "~> 2.26.0"
+  spec.dependency "SwiftNIOHTTP1", "~> 2.28.0"
 end

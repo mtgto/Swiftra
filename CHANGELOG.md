@@ -1,5 +1,13 @@
 CHANGELOG
 ====
+## v0.5.0 (2021-04-30)
+
+### Changed
+
+- Support Swift 5.4 (`@resultHandler`)
+- Refactor App source code
+- Update SwiftNIO to 2.28.0
+
 ## v0.4.0 (2021-02-20)
 
 ### Added

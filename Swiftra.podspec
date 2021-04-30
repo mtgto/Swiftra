@@ -3,7 +3,7 @@
 
 Pod::Spec.new do |spec|
   spec.name         = "Swiftra"
-  spec.version      = "0.4.0"
+  spec.version      = "0.5.0"
   spec.summary      = "A tiny Sinatra-like web framework for Swift."
   spec.homepage     = "https://github.com/mtgto/Swiftra"
   spec.license      = { :type => "Apache-2.0", :file => "LICENSE.txt" }

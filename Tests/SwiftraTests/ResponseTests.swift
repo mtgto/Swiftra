@@ -19,6 +19,14 @@ class ResponseTests: XCTestCase {
         XCTAssertTrue(jsonResponse.createHeaders().contains(where: { ("Content-Type", "application/json; charset=utf-8") == $0 }))
     }
 
+    func testResponseJson() {
+        let jsonEncoder = JSONEncoder()
+        jsonEncoder.dateEncodingStrategy = .iso8601
+        let textResponse: Response = .init(json: ["foo": Date(timeIntervalSinceReferenceDate: 0)], jsonEncoder: jsonEncoder)!
+        XCTAssertTrue(textResponse.createHeaders().contains(where: { ("Content-Type", "application/json; charset=utf-8") == $0 }))
+        XCTAssertEqual(String(data: textResponse.data(), encoding: .utf8), #"{"foo":"2001-01-01T00:00:00Z"}"#)
+    }
+
     static var allTests = [
         ("testResponse", testResponse)
     ]

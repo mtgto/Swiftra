@@ -25,9 +25,8 @@ public enum Response {
     }
 
     public init?<T: Encodable>(
-        json: T, status: HTTPResponseStatus = .ok, contentType: String = ContentType.applicationJson.withCharset(), headers: [(String, String)] = []
+        json: T, status: HTTPResponseStatus = .ok, contentType: String = ContentType.applicationJson.withCharset(), headers: [(String, String)] = [], jsonEncoder: JSONEncoder = JSONEncoder()
     ) {
-        let jsonEncoder = JSONEncoder()
         if let data = try? jsonEncoder.encode(json) {
             self.init(data: data, status: status, contentType: contentType, headers: headers)
         } else {

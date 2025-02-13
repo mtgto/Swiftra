@@ -3,7 +3,7 @@
 
 Pod::Spec.new do |spec|
   spec.name         = "Swiftra"
-  spec.version      = "0.5.0"
+  spec.version      = "0.6.0"
   spec.summary      = "A tiny Sinatra-like web framework for Swift."
   spec.homepage     = "https://github.com/mtgto/Swiftra"
   spec.license      = { :type => "Apache-2.0", :file => "LICENSE.txt" }
@@ -13,5 +13,5 @@ Pod::Spec.new do |spec|
   spec.source       = { :git => "https://github.com/mtgto/Swiftra.git", :tag => "#{spec.version}" }
   spec.source_files  = "Sources/Swiftra/*.swift"
   spec.swift_version = '5.0'
-  spec.dependency "SwiftNIOHTTP1", "~> 2.28.0"
+  spec.dependency "SwiftNIOHTTP1", "~> 2.40.0"
 end

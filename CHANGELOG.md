@@ -1,5 +1,15 @@
 CHANGELOG
 ====
+## v0.6.0 (2025-02-13)
+
+### Changed
+
+- Update SwiftNIO to 2.40.0
+
+### Added
+
+- Add new argument `jsonEncoder` to `Response.init?(json:status:contentType:headers:jsonEncoder:)`
+
 ## v0.5.0 (2021-04-30)
 
 ### Changed
